@@ -26,11 +26,13 @@ PS: 因为平时事情比较多，维护频率应该不会很高
 
 ## 软件截图
 
-![](https://res.shirakawatyu.top/85d8aab0603e436ca1133faf60849acb.jpg)
-![](https://res.shirakawatyu.top/52d19fd6a51f4633a3478a7e8718f411.jpg)
-![](https://res.shirakawatyu.top/a0d46b61e7dc45e2ba2d987890691f0f.jpg)
-![](https://res.shirakawatyu.top/eee264b0602e496793ce4f69608c6b95.jpg)
-![](https://res.shirakawatyu.top/6d2e2378cc9f496b97fc01047077ddd7.jpg)
+<div style="display: flex">
+  <img src="screenshots/1705249279177.jpg" width="20%"/>
+  <img src="screenshots/1705249279198.jpg" width="20%"/>
+  <img src="screenshots/1705249279219.jpg" width="20%"/>
+  <img src="screenshots/1705249279240.jpg" width="20%"/>
+  <img src="screenshots/1705249279266.jpg" width="20%"/>
+</div>
 
 ## 开源许可
 
