@@ -26,11 +26,13 @@ PS: 因为平时事情比较多，维护频率应该不会很高
 
 ## 软件截图
 
-![](screenshots/1705249279177.jpg)
-![](screenshots/1705249279198.jpg)
-![](screenshots/1705249279219.jpg)
-![](screenshots/1705249279240.jpg)
-![](screenshots/1705249279266.jpg)
+<div style="display: flex">
+  <img src="screenshots/1705249279177.jpg" width="20%"/>
+  <img src="screenshots/1705249279198.jpg" width="20%"/>
+  <img src="screenshots/1705249279219.jpg" width="20%"/>
+  <img src="screenshots/1705249279240.jpg" width="20%"/>
+  <img src="screenshots/1705249279266.jpg" width="20%"/>
+</div>
 
 ## 开源许可
 
