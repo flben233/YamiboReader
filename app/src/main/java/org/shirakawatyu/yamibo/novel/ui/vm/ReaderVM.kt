@@ -3,30 +3,23 @@ package org.shirakawatyu.yamibo.novel.ui.vm
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import com.alibaba.fastjson2.JSON
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.shirakawatyu.yamibo.novel.bean.Content
 import org.shirakawatyu.yamibo.novel.bean.ContentType
-import org.shirakawatyu.yamibo.novel.bean.Favorite
 import org.shirakawatyu.yamibo.novel.bean.ReaderSettings
 import org.shirakawatyu.yamibo.novel.constant.RequestConfig
-import org.shirakawatyu.yamibo.novel.global.GlobalData
 import org.shirakawatyu.yamibo.novel.ui.state.ReaderState
-import org.shirakawatyu.yamibo.novel.util.DataStoreUtil
 import org.shirakawatyu.yamibo.novel.util.FavoriteUtil
 import org.shirakawatyu.yamibo.novel.util.HTMLUtil
 import org.shirakawatyu.yamibo.novel.util.SettingsUtil
@@ -56,7 +49,7 @@ class ReaderVM : ViewModel() {
         url = initUrl
         maxWidth = initWidth
         maxHeight = initHeight
-        SettingsUtil.getSettings {
+        SettingsUtil.getSettings(callback =  {
             _uiState.value = _uiState.value.copy(
                 fontSize = ValueUtil.pxToSp(it.fontSizePx),
                 lingHeight = ValueUtil.pxToSp(it.lineHeightPx),
@@ -69,7 +62,15 @@ class ReaderVM : ViewModel() {
                 }
                 displayWebView = true
             }
-        }
+        }, onNull = {
+            FavoriteUtil.getFavoriteMap {it2 ->
+                it2[url]?.let { it1 ->
+                    println("first: $it1")
+                    _uiState.value = _uiState.value.copy(currentView = it1.lastView)
+                }
+                displayWebView = true
+            }
+        })
     }
 
     fun loadFinished(html: String) {
@@ -118,7 +119,8 @@ class ReaderVM : ViewModel() {
     @OptIn(ExperimentalFoundationApi::class)
     fun onPageChange(curPagerState: PagerState) {
         var viewIndex = uiState.value.currentView
-        pagerState = curPagerState
+        if (pagerState == null)
+            pagerState = curPagerState
 //        if (curPagerState.currentPage != 0) {
             saveHistory(curPagerState.currentPage)
 //        }

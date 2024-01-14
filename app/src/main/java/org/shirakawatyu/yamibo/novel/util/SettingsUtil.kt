@@ -12,10 +12,10 @@ class SettingsUtil {
             DataStoreUtil.addData(JSON.toJSONString(settings), key)
         }
 
-        fun getSettings(callback: (settings: ReaderSettings) -> Unit) {
+        fun getSettings(callback: (settings: ReaderSettings) -> Unit, onNull: () -> Unit) {
             DataStoreUtil.getData(key, callback = {
                 callback(JSON.parseObject(it, ReaderSettings::class.java))
-            })
+            }, onNull = onNull)
         }
     }
 }
