@@ -119,11 +119,10 @@ class ReaderVM : ViewModel() {
     @OptIn(ExperimentalFoundationApi::class)
     fun onPageChange(curPagerState: PagerState) {
         var viewIndex = uiState.value.currentView
-        if (pagerState == null)
+        if (pagerState == null) {
             pagerState = curPagerState
-//        if (curPagerState.currentPage != 0) {
-            saveHistory(curPagerState.currentPage)
-//        }
+        }
+        saveHistory(curPagerState.currentPage)
         if (curPagerState.currentPage == curPagerState.targetPage &&
             curPagerState.currentPage == uiState.value.htmlList.size - 1 &&
             curPagerState.currentPage > 0
