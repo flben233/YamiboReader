@@ -36,6 +36,7 @@ fun ContentViewer(
     Column {
         if (data.type == ContentType.IMG) {
             SubcomposeAsyncImage(
+                modifier = Modifier.weight(1f),
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(data.data)
                     .addHeader("Cookie", GlobalData.cookie)

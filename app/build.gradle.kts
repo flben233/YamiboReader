@@ -11,7 +11,7 @@ android {
         applicationId = "org.shirakawatyu.yamibo.novel"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
+        versionCode = 3
         versionName = "Plumeria"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
