@@ -17,6 +17,7 @@ PS: 因为平时事情比较多，维护频率应该不会很高
 1. 收藏列表不会自动刷新，登录后请手动点击右上角刷新
 2. 阅读器不会自动跳转到上次阅读的页数，进入阅读器后请点击页面中央手动跳转至上次阅读的地方
 3. 登录状态有的时候不能被保存下来，暂时还没查明情况，为了稳定保存登录信息可以在登录之后阅读几页
+4. 跳页时有概率崩溃
 
 ## 软件下载
 
@@ -27,11 +28,11 @@ PS: 因为平时事情比较多，维护频率应该不会很高
 ## 软件截图
 
 <div style="display: flex">
-  <img src="screenshots/1705249279177.jpg" width="20%"/>
-  <img src="screenshots/1705249279198.jpg" width="20%"/>
-  <img src="screenshots/1705249279219.jpg" width="20%"/>
-  <img src="screenshots/1705249279240.jpg" width="20%"/>
-  <img src="screenshots/1705249279266.jpg" width="20%"/>
+  <img src="screenshots/1705249279177.jpg" width="18%"/>
+  <img src="screenshots/1705249279198.jpg" width="18%"/>
+  <img src="screenshots/1705249279219.jpg" width="18%"/>
+  <img src="screenshots/1705249279240.jpg" width="18%"/>
+  <img src="screenshots/1705249279266.jpg" width="18%"/>
 </div>
 
 ## 开源许可
