@@ -1,6 +1,8 @@
 # 300文学阅读器
 
-为百合会论坛小说提供更好的阅读体验，支持阅读点记忆、左右滑动翻页、跳页等常见阅读器功能，同时为其漫画阅读提供有限支持（不支持跳页、缩放、阅读点记忆，只能以左右滑动的方式浏览）
+为百合会论坛小说提供更好的阅读体验，支持阅读点记忆、左右滑动翻页、跳页等常见阅读器功能，同时为其漫画阅读提供有限支持（不支持缩放和从右往左布局，只能以从左往右滑动的方式浏览）
+
+系统要求: Android 7.0及以上
 
 PS: 因为平时事情比较多，维护频率应该不会很高
 
@@ -17,13 +19,13 @@ PS: 因为平时事情比较多，维护频率应该不会很高
 1. 收藏列表不会自动刷新，登录后请手动点击右上角刷新
 2. 阅读器不会自动跳转到上次阅读的页数，进入阅读器后请点击页面中央手动跳转至上次阅读的地方
 3. 登录状态有的时候不能被保存下来，暂时还没查明情况，为了稳定保存登录信息可以在登录之后阅读几页
-4. 跳页时有概率崩溃
+4. 首次启动可能页边距不正常，重启一次即可
 
 ## 软件下载
 
 [Github Release](https://github.com/flben233/YamiboReader/releases)
 
-[蓝奏云分流(手机使用浏览器打开后以电脑方式浏览)](https://wwqx.lanzoul.com/imAg71l4snjc)
+[蓝奏云分流(手机使用浏览器打开后以电脑方式浏览，密码:he2j)](https://wwqx.lanzoul.com/b04371uhi)
 
 ## 软件截图
 
@@ -43,9 +45,11 @@ PS: 因为平时事情比较多，维护频率应该不会很高
 
 网络: [Okhttp3](https://github.com/square/okhttp)
 
-网络: [Jsoup](https://github.com/jhy/jsoup)
+HTML解析: [Jsoup](https://github.com/jhy/jsoup)
 
 JSON解析: [FastJSON2](https://github.com/alibaba/fastjson2)
+
+图片显示: [coil](https://github.com/coil-kt/coil)
 
 ## 维护者
 
