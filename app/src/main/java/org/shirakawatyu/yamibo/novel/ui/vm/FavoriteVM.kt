@@ -1,5 +1,6 @@
 package org.shirakawatyu.yamibo.novel.ui.vm
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +18,15 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.net.URLEncoder
-import java.nio.charset.Charset
 
 class FavoriteVM: ViewModel() {
     private val _uiState = MutableStateFlow(FavoriteState())
     val uiState = _uiState.asStateFlow()
 
+    private val logTag = "FavoriteVM"
+
     init {
-        println("VM创建")
+        Log.i(logTag, "VM创建")
         FavoriteUtil.getFavorite {
             _uiState.value = FavoriteState(it)
         }
@@ -33,7 +35,7 @@ class FavoriteVM: ViewModel() {
     fun refreshList() {
         GlobalData.loading = true
         CookieUtil.getCookie {
-            println(it)
+            Log.i(logTag, it)
             val favoriteApi = YamiboRetrofit.getInstance(it).create(FavoriteApi::class.java)
             favoriteApi.getFavoritePage().enqueue(object: Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -45,7 +47,7 @@ class FavoriteVM: ViewModel() {
                         favList.forEach { li ->
                             val title = li.text()
                             val url = li.child(1).attribute("href").value
-                            println(url)
+                            Log.i(logTag, url)
                             objList.add(Favorite(title, url))
                         }
                         FavoriteUtil.addFavorite(objList) {filteredList ->
@@ -53,7 +55,7 @@ class FavoriteVM: ViewModel() {
                             GlobalData.loading = false
                         }
                     }
-                    println(response.body()?.string())
+                    response.body()?.string()?.let { it1 -> Log.i(logTag, it1) }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {

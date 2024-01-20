@@ -12,5 +12,6 @@ data class ReaderState (
     val initPage: Int = 0,
     val lingHeight: TextUnit = 39.sp,
     val padding: Dp = 16.dp,
-    val fontSize: TextUnit = 18.sp
+    val fontSize: TextUnit = 18.sp,
+    val letterSpacing:TextUnit = 2.sp
 )

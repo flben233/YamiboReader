@@ -1,15 +1,18 @@
 package org.shirakawatyu.yamibo.novel.module
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.webkit.WebView
-import org.jsoup.Jsoup
-import org.shirakawatyu.yamibo.novel.constant.RequestConfig
 import org.shirakawatyu.yamibo.novel.global.GlobalData
 
 class PassageWebViewClient(val onFinished: (html: String, url: String?) -> Unit): YamiboWebViewClient() {
 
+    private val logTag = "PassageWebViewClient"
+
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-        println(url)
+        if (url != null) {
+            Log.i(logTag, url)
+        }
         GlobalData.loading = true
         super.onPageStarted(view, url, favicon)
     }

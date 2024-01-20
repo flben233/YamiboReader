@@ -1,5 +1,6 @@
 package org.shirakawatyu.yamibo.novel.ui.vm
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
@@ -36,13 +37,14 @@ class ReaderVM : ViewModel() {
     private var maxHeight = 0.dp
     private var maxWidth = 0.dp
     private var initialPage = 0
+    private val logTag = "ReaderVM"
     var url by mutableStateOf("")
         private set
     var displayWebView by mutableStateOf(false)
         private set
 
     init {
-        println("VM创建!")
+        Log.i(logTag, "VM created.")
     }
 
     fun firstLoad(initUrl: String, initHeight: Dp, initWidth: Dp) {
@@ -57,7 +59,7 @@ class ReaderVM : ViewModel() {
             )
             FavoriteUtil.getFavoriteMap {it2 ->
                 it2[url]?.let { it1 ->
-                    println("first: $it1")
+                    Log.i(logTag, "first: $it1")
                     _uiState.value = _uiState.value.copy(currentView = it1.lastView)
                 }
                 displayWebView = true
@@ -65,7 +67,7 @@ class ReaderVM : ViewModel() {
         }, onNull = {
             FavoriteUtil.getFavoriteMap {it2 ->
                 it2[url]?.let { it1 ->
-                    println("first: $it1")
+                    Log.i(logTag, "first: $it1")
                     _uiState.value = _uiState.value.copy(currentView = it1.lastView)
                 }
                 displayWebView = true
@@ -99,10 +101,11 @@ class ReaderVM : ViewModel() {
             val text = HTMLUtil.toText(node.html())
             val pagedText = TextUtil.pagingText(
                 text,
-                maxHeight - uiState.value.padding,
-                maxWidth - uiState.value.padding,
+                maxHeight - uiState.value.padding - ValueUtil.spToDp(uiState.value.lingHeight),
+                maxWidth - uiState.value.padding * 2,
                 uiState.value.fontSize,
-                uiState.value.lingHeight
+                uiState.value.letterSpacing,
+                uiState.value.lingHeight,
             )
             for (t in pagedText) {
                 passages.add(Content(t, ContentType.TEXT))

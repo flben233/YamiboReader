@@ -54,7 +54,6 @@ fun ReaderPage(
     }
     if (readerVM.displayWebView) {
         PassageWebView(url = "${RequestConfig.BASE_URL}/${url}&page=${uiState.currentView}") { html, fromUrl ->
-            println("currentView: " + uiState.currentView)
             readerVM.loadFinished(html)
         }
     } else {
@@ -87,6 +86,7 @@ fun ReaderPage(
                     data = uiState.htmlList[page],
                     padding = uiState.padding,
                     lineHeight = uiState.lingHeight,
+                    letterSpacing = uiState.letterSpacing,
                     fontSize = uiState.fontSize,
                     currentPage = pagerState.currentPage,
                     pageCount = pagerState.pageCount

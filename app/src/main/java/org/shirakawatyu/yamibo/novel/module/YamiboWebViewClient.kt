@@ -4,13 +4,6 @@ import android.graphics.Bitmap
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import org.shirakawatyu.yamibo.novel.global.GlobalData
 import org.shirakawatyu.yamibo.novel.util.CookieUtil
 
@@ -42,6 +35,7 @@ open class YamiboWebViewClient : WebViewClient() {
         val cookie = cookieManager.getCookie(url)
         CookieUtil.saveCookie(cookie)
         GlobalData.loading = false
+        GlobalData.cookie = cookie
         super.onPageFinished(view, url)
     }
 }

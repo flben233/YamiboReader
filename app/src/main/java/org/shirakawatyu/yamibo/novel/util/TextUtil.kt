@@ -2,7 +2,6 @@ package org.shirakawatyu.yamibo.novel.util
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
-import kotlin.math.ceil
 
 class TextUtil {
     companion object {
@@ -11,32 +10,26 @@ class TextUtil {
             height: Dp,
             width: Dp,
             fontSize: TextUnit,
+            letterSpacing: TextUnit,
             lineHeight: TextUnit
         ): List<String> {
             val textLines = text.split("\n")
-            val perLineNum = (ValueUtil.dpToPx(width) / ValueUtil.spToPx(fontSize)).toInt()
-            var lineNum = 0
-            val maxLine = (ValueUtil.dpToPx(height) / ValueUtil.spToPx(lineHeight)).toInt() - 1
-            val resultList = ArrayList<String>()
-            var textPart = ""
+            val perLineNum = (ValueUtil.dpToPx(width).toInt() /
+                    (ValueUtil.spToPx(fontSize) + ValueUtil.spToPx(letterSpacing)).toInt())
+            val maxLine = (ValueUtil.dpToPx(height) / ValueUtil.spToPx(lineHeight)).toInt()
+            val result = ArrayList<String>()
+            val resultLines = ArrayList<String>()
             for (line in textLines) {
-                val needLine = calculateLine(line.length, perLineNum)
-                if (lineNum + needLine > maxLine) {
-                    val part1 = (maxLine - lineNum) * perLineNum
-                    resultList.add(textPart + line.substring(0, part1) + "\n")
-                    textPart = line.substring(part1) + "\n"
-                    lineNum = calculateLine(line.length - part1, perLineNum)
-                } else {
-                    textPart += (line + "\n")
-                    lineNum += needLine
+                if (line.trim().isEmpty()) {
+                    continue
                 }
+                resultLines.addAll(line.chunked(perLineNum))
             }
-            resultList.add(textPart)
-            return resultList
+            resultLines.chunked(maxLine).forEach {
+                result.add(it.joinToString("\n") + "\n")
+            }
+            return result
         }
 
-        private fun calculateLine(wordNum: Int, perLineNum: Int): Int {
-            return ceil(wordNum / perLineNum.toFloat()).toInt()
-        }
     }
 }

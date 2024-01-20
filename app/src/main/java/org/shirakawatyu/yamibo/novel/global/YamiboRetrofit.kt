@@ -31,6 +31,7 @@ class YamiboRetrofit {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient)
                 .build()
+            lastCookie = cookie
             return instance
         }
     }

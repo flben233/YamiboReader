@@ -10,6 +10,7 @@ import org.shirakawatyu.yamibo.novel.global.GlobalData
 
 class ValueUtil {
     companion object {
+
         fun dpToPx(dp: Dp): Float {
             return TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, dp.value, GlobalData.displayMetrics
@@ -23,11 +24,15 @@ class ValueUtil {
         }
 
         fun pxToDp(pxValue: Float): Dp {
-            return (pxValue / GlobalData.displayMetrics!!.density + 0.5f).dp
+            return (pxValue / GlobalData.displayMetrics!!.density).dp
+        }
+
+        fun spToDp(sp: TextUnit): Dp {
+            return pxToDp(spToPx(sp))
         }
 
         fun pxToSp(pxValue: Float): TextUnit {
-            return (pxValue / GlobalData.displayMetrics!!.density + 0.5f).sp
+            return (pxValue / GlobalData.displayMetrics!!.density).sp
         }
     }
 }
