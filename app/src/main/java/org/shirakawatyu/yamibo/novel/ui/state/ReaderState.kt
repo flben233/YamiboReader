@@ -1,5 +1,6 @@
 package org.shirakawatyu.yamibo.novel.ui.state
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -13,5 +14,7 @@ data class ReaderState (
     val lingHeight: TextUnit = 39.sp,
     val padding: Dp = 16.dp,
     val fontSize: TextUnit = 18.sp,
-    val letterSpacing:TextUnit = 2.sp
+    val letterSpacing:TextUnit = 2.sp,
+    var scale: Float = 1f,
+    var offset: Offset = Offset(0f, 0f)
 )

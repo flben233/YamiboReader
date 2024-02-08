@@ -32,6 +32,7 @@ class FavoriteVM: ViewModel() {
         }
     }
 
+    //TODO: 改成手动添加链接、长按删除记录
     fun refreshList() {
         GlobalData.loading = true
         CookieUtil.getCookie {
@@ -44,6 +45,7 @@ class FavoriteVM: ViewModel() {
                         val parse = Jsoup.parse(respHTML)
                         val favList = parse.getElementsByClass("sclist")
                         val objList = ArrayList<Favorite>()
+
                         favList.forEach { li ->
                             val title = li.text()
                             val url = li.child(1).attribute("href").value

@@ -2,6 +2,7 @@ package org.shirakawatyu.yamibo.novel.ui.page
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -23,6 +24,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -79,6 +82,17 @@ fun ReaderPage(
                     .clickable(indication = null,
                         interactionSource = remember { MutableInteractionSource() },
                         onClick = { showSettingDialog = true }
+                    )
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, zoom, _ ->
+                            readerVM.onTransform(pan, zoom)
+                        }
+                    }
+                    .graphicsLayer(
+                        scaleX = uiState.scale,
+                        scaleY = uiState.scale,
+                        translationX = uiState.offset.x,
+                        translationY = uiState.offset.y
                     ),
                 state = pagerState
             ) { page ->

@@ -6,6 +6,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -19,7 +20,6 @@ import org.jsoup.Jsoup
 import org.shirakawatyu.yamibo.novel.bean.Content
 import org.shirakawatyu.yamibo.novel.bean.ContentType
 import org.shirakawatyu.yamibo.novel.bean.ReaderSettings
-import org.shirakawatyu.yamibo.novel.constant.RequestConfig
 import org.shirakawatyu.yamibo.novel.ui.state.ReaderState
 import org.shirakawatyu.yamibo.novel.util.FavoriteUtil
 import org.shirakawatyu.yamibo.novel.util.HTMLUtil
@@ -51,13 +51,13 @@ class ReaderVM : ViewModel() {
         url = initUrl
         maxWidth = initWidth
         maxHeight = initHeight
-        SettingsUtil.getSettings(callback =  {
+        SettingsUtil.getSettings(callback = {
             _uiState.value = _uiState.value.copy(
                 fontSize = ValueUtil.pxToSp(it.fontSizePx),
                 lingHeight = ValueUtil.pxToSp(it.lineHeightPx),
                 padding = it.padding
             )
-            FavoriteUtil.getFavoriteMap {it2 ->
+            FavoriteUtil.getFavoriteMap { it2 ->
                 it2[url]?.let { it1 ->
                     Log.i(logTag, "first: $it1")
                     _uiState.value = _uiState.value.copy(currentView = it1.lastView)
@@ -65,7 +65,7 @@ class ReaderVM : ViewModel() {
                 displayWebView = true
             }
         }, onNull = {
-            FavoriteUtil.getFavoriteMap {it2 ->
+            FavoriteUtil.getFavoriteMap { it2 ->
                 it2[url]?.let { it1 ->
                     Log.i(logTag, "first: $it1")
                     _uiState.value = _uiState.value.copy(currentView = it1.lastView)
@@ -98,21 +98,26 @@ class ReaderVM : ViewModel() {
         val passages = ArrayList<Content>()
         for (node in nodes) {
             node.getElementsByTag("i").remove()
-            val text = HTMLUtil.toText(node.html())
-            val pagedText = TextUtil.pagingText(
-                text,
-                maxHeight - uiState.value.padding - ValueUtil.spToDp(uiState.value.lingHeight),
-                maxWidth - uiState.value.padding * 2,
-                uiState.value.fontSize,
-                uiState.value.letterSpacing,
-                uiState.value.lingHeight,
-            )
-            for (t in pagedText) {
-                passages.add(Content(t, ContentType.TEXT))
+            try {
+                val text = HTMLUtil.toText(node.html())
+                val pagedText = TextUtil.pagingText(
+                    text,
+                    maxHeight - uiState.value.padding - ValueUtil.spToDp(uiState.value.lingHeight),
+                    maxWidth - uiState.value.padding * 2,
+                    uiState.value.fontSize,
+                    uiState.value.letterSpacing,
+                    uiState.value.lingHeight,
+                )
+                for (t in pagedText) {
+                    passages.add(Content(t, ContentType.TEXT))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
             for (element in node.getElementsByTag("img")) {
                 val src = element.attribute("src").value
-                passages.add(Content("${RequestConfig.BASE_URL}/${src}", ContentType.IMG))
+                passages.add(Content(src, ContentType.IMG))
+//                passages.add(Content("${RequestConfig.BASE_URL}/${src}", ContentType.IMG))
             }
         }
         passages.add(Content("正在加载下一页", ContentType.TEXT))
@@ -140,6 +145,9 @@ class ReaderVM : ViewModel() {
         } else {
             pageEnd = true
         }
+        if (curPagerState.currentPage != curPagerState.targetPage) {
+            _uiState.value = _uiState.value.copy(scale = 1f, offset = Offset(0f, 0f))
+        }
     }
 
     private fun saveHistory(curPage: Int) {
@@ -166,6 +174,12 @@ class ReaderVM : ViewModel() {
             )
             SettingsUtil.saveSettings(settings)
         }
+    }
+
+    fun onTransform(pan: Offset, zoom: Float) {
+        val scale = (_uiState.value.scale * zoom).coerceIn(0.5f, 3f)
+        val offset = if (scale == 1f) Offset(0f, 0f) else _uiState.value.offset + pan
+        _uiState.value = _uiState.value.copy(scale = scale, offset = offset)
     }
 
     fun onSetView(view: Int) {
