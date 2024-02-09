@@ -96,15 +96,17 @@ fun ReaderPage(
                     ),
                 state = pagerState
             ) { page ->
-                ContentViewer(
-                    data = uiState.htmlList[page],
-                    padding = uiState.padding,
-                    lineHeight = uiState.lingHeight,
-                    letterSpacing = uiState.letterSpacing,
-                    fontSize = uiState.fontSize,
-                    currentPage = pagerState.currentPage,
-                    pageCount = pagerState.pageCount
-                )
+                if (page == pagerState.currentPage || page - pagerState.currentPage == -1 ||
+                    (page - pagerState.currentPage == 1 && pagerState.currentPageOffsetFraction > -0.001))
+                    ContentViewer(
+                        data = uiState.htmlList[page],
+                        padding = uiState.padding,
+                        lineHeight = uiState.lingHeight,
+                        letterSpacing = uiState.letterSpacing,
+                        fontSize = uiState.fontSize,
+                        currentPage = pagerState.currentPage,
+                        pageCount = pagerState.pageCount
+                    )
                 readerVM.onPageChange(pagerState)
             }
         }

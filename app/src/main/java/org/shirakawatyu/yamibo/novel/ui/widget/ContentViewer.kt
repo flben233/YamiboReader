@@ -35,11 +35,12 @@ fun ContentViewer(
 ) {
     Column {
         if (data.type == ContentType.IMG) {
+            val byteData = Base64.decode(data.data)
             Image(
                 bitmap = BitmapFactory.decodeByteArray(
-                    Base64.decode(data.data),
+                    byteData,
                     0,
-                    Base64.decode(data.data).size
+                    byteData.size
                 ).asImageBitmap(),
                 contentDescription = "",
                 contentScale = ContentScale.Fit,
@@ -50,9 +51,10 @@ fun ContentViewer(
 //            SubcomposeAsyncImage(
 //                modifier = Modifier.weight(1f),
 //                model = ImageRequest.Builder(LocalContext.current)
-//                    .data(data.data)
-//                    .addHeader("Cookie", GlobalData.cookie)
-//                    .addHeader("User-Agent", RequestConfig.UA)
+//                    .data(Base64.decode(data.data))
+//                    .crossfade(true)
+////                    .addHeader("Cookie", GlobalData.cookie)
+////                    .addHeader("User-Agent", RequestConfig.UA)
 //                    .build(),
 //                onError = {
 //                    it.result.throwable.printStackTrace()
@@ -81,7 +83,7 @@ fun ContentViewer(
             letterSpacing = letterSpacing,
             fontSize = 12.sp,
             color = Color.DarkGray,
-            text = "${currentPage}/${pageCount}"
+            text = "${currentPage}/${pageCount - 2}"
         )
     }
 }

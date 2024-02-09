@@ -130,7 +130,6 @@ class ReaderVM : ViewModel() {
         if (pagerState == null) {
             pagerState = curPagerState
         }
-        saveHistory(curPagerState.currentPage)
         if (curPagerState.currentPage == curPagerState.targetPage &&
             curPagerState.currentPage == uiState.value.htmlList.size - 1 &&
             curPagerState.currentPage > 0
@@ -146,7 +145,10 @@ class ReaderVM : ViewModel() {
             pageEnd = true
         }
         if (curPagerState.currentPage != curPagerState.targetPage) {
-            _uiState.value = _uiState.value.copy(scale = 1f, offset = Offset(0f, 0f))
+            saveHistory(curPagerState.currentPage)
+            if (_uiState.value.scale != 1f) {
+                _uiState.value = _uiState.value.copy(scale = 1f, offset = Offset(0f, 0f))
+            }
         }
     }
 
