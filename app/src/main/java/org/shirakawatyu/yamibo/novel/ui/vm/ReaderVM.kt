@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.shirakawatyu.yamibo.novel.bean.Content
 import org.shirakawatyu.yamibo.novel.bean.ContentType
 import org.shirakawatyu.yamibo.novel.bean.ReaderSettings
+import org.shirakawatyu.yamibo.novel.constant.RequestConfig
 import org.shirakawatyu.yamibo.novel.ui.state.ReaderState
 import org.shirakawatyu.yamibo.novel.util.FavoriteUtil
 import org.shirakawatyu.yamibo.novel.util.HTMLUtil
@@ -116,7 +117,12 @@ class ReaderVM : ViewModel() {
             }
             for (element in node.getElementsByTag("img")) {
                 val src = element.attribute("src").value
-                passages.add(Content(src, ContentType.IMG))
+                if (src.length > 10) {
+//                    passages.add(Content(src, ContentType.IMG))
+                    passages.add(Content("${RequestConfig.BASE_URL}/${src}", ContentType.IMG))
+                }
+//                println(src)
+
 //                passages.add(Content("${RequestConfig.BASE_URL}/${src}", ContentType.IMG))
             }
         }
@@ -132,23 +138,21 @@ class ReaderVM : ViewModel() {
         }
         if (curPagerState.currentPage == curPagerState.targetPage &&
             curPagerState.currentPage == uiState.value.htmlList.size - 1 &&
-            curPagerState.currentPage > 0
+            curPagerState.currentPage > 0 && pageEnd
         ) {
-            if (pageEnd) {
-                viewIndex += 1
-                displayWebView = true
-                _uiState.value = _uiState.value.copy(currentView = viewIndex)
-                pagerState = curPagerState
-                pageEnd = false
-            }
+            viewIndex += 1
+            displayWebView = true
+            _uiState.value = _uiState.value.copy(currentView = viewIndex)
+            pagerState = curPagerState
+            pageEnd = false
         } else {
             pageEnd = true
         }
-        if (curPagerState.currentPage != curPagerState.targetPage) {
+        if (curPagerState.currentPage == 0 || curPagerState.currentPage != curPagerState.targetPage) {
             saveHistory(curPagerState.currentPage)
-            if (_uiState.value.scale != 1f) {
-                _uiState.value = _uiState.value.copy(scale = 1f, offset = Offset(0f, 0f))
-            }
+        }
+        if (curPagerState.currentPage != curPagerState.targetPage && _uiState.value.scale != 1f) {
+            _uiState.value = _uiState.value.copy(scale = 1f, offset = Offset(0f, 0f))
         }
     }
 

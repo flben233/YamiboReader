@@ -6,9 +6,10 @@ class HTMLUtil {
             return html
                 .replace("<br>", "\n")
                 .replace(Regex("<.*?>"), "")
-                .replace(" ", "")
+//                .replace(" ", "")
                 .replace("&nbsp;", " ")
-                .replace("\u0020\u0020", "\u3000")
+//                .replace("\u0020\u0020\u0020", "\u3000")
+                .replace(Regex(" {3,}"), "    ")
                 .replace(Regex("\n+"), "\n")
                 .trim()
         }
