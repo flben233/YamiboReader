@@ -21,12 +21,14 @@ import org.shirakawatyu.yamibo.novel.bean.Content
 import org.shirakawatyu.yamibo.novel.bean.ContentType
 import org.shirakawatyu.yamibo.novel.bean.ReaderSettings
 import org.shirakawatyu.yamibo.novel.constant.RequestConfig
+import org.shirakawatyu.yamibo.novel.global.GlobalData
 import org.shirakawatyu.yamibo.novel.ui.state.ReaderState
 import org.shirakawatyu.yamibo.novel.util.FavoriteUtil
 import org.shirakawatyu.yamibo.novel.util.HTMLUtil
 import org.shirakawatyu.yamibo.novel.util.SettingsUtil
 import org.shirakawatyu.yamibo.novel.util.TextUtil
 import org.shirakawatyu.yamibo.novel.util.ValueUtil
+import java.util.concurrent.Executors
 
 class ReaderVM : ViewModel() {
     private val _uiState = MutableStateFlow(ReaderState())
@@ -38,6 +40,7 @@ class ReaderVM : ViewModel() {
     private var maxHeight = 0.dp
     private var maxWidth = 0.dp
     private var initialPage = 0
+    private val executor = Executors.newFixedThreadPool(32)
     private val logTag = "ReaderVM"
     var url by mutableStateOf("")
         private set
@@ -77,8 +80,15 @@ class ReaderVM : ViewModel() {
     }
 
     fun loadFinished(html: String) {
-        getContentByHTML(html)
-        displayWebView = false
+        GlobalData.loading = true
+        Thread {
+            val l = System.currentTimeMillis()
+            getContentByHTML(html)
+            println(System.currentTimeMillis() - l)
+            GlobalData.loading = false
+            displayWebView = false
+            onSetPage(0)
+        }.start()
         FavoriteUtil.getFavoriteMap {
             it[url]?.let { it1 ->
                 if (uiState.value.currentView == it1.lastView) {
@@ -86,7 +96,7 @@ class ReaderVM : ViewModel() {
                 }
             }
         }
-        onSetPage(0)
+//        onSetPage(0)
     }
 
     fun jumpPage() {
@@ -95,35 +105,23 @@ class ReaderVM : ViewModel() {
 
     private fun getContentByHTML(html: String) {
         val doc = Jsoup.parse(html)
-        val nodes = doc.getElementsByClass("message")
+        doc.getElementsByTag("i").forEach { it.remove() }
         val passages = ArrayList<Content>()
-        for (node in nodes) {
-            node.getElementsByTag("i").remove()
-            try {
-                val text = HTMLUtil.toText(node.html())
-                val pagedText = TextUtil.pagingText(
-                    text,
-                    maxHeight - uiState.value.padding - ValueUtil.spToDp(uiState.value.lingHeight),
-                    maxWidth - uiState.value.padding * 2,
-                    uiState.value.fontSize,
-                    uiState.value.letterSpacing,
-                    uiState.value.lingHeight,
-                )
-                for (t in pagedText) {
-                    passages.add(Content(t, ContentType.TEXT))
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+        for (node in doc.getElementsByClass("message")) {
+            val pagedText = TextUtil.pagingText(
+                HTMLUtil.toText(node.html()),
+                maxHeight - uiState.value.padding - ValueUtil.spToDp(uiState.value.lingHeight),
+                maxWidth - uiState.value.padding * 2,
+                uiState.value.fontSize,
+                uiState.value.letterSpacing,
+                uiState.value.lingHeight,
+            )
+            for (t in pagedText) {
+                passages.add(Content(t, ContentType.TEXT))
             }
             for (element in node.getElementsByTag("img")) {
                 val src = element.attribute("src").value
-                if (src.length > 10) {
-//                    passages.add(Content(src, ContentType.IMG))
-                    passages.add(Content("${RequestConfig.BASE_URL}/${src}", ContentType.IMG))
-                }
-//                println(src)
-
-//                passages.add(Content("${RequestConfig.BASE_URL}/${src}", ContentType.IMG))
+                passages.add(Content("${RequestConfig.BASE_URL}/${src}", ContentType.IMG))
             }
         }
         passages.add(Content("正在加载下一页", ContentType.TEXT))
@@ -149,7 +147,7 @@ class ReaderVM : ViewModel() {
             pageEnd = true
         }
         if (curPagerState.currentPage == 0 || curPagerState.currentPage != curPagerState.targetPage) {
-            saveHistory(curPagerState.currentPage)
+            saveHistory(curPagerState.targetPage)
         }
         if (curPagerState.currentPage != curPagerState.targetPage && _uiState.value.scale != 1f) {
             _uiState.value = _uiState.value.copy(scale = 1f, offset = Offset(0f, 0f))

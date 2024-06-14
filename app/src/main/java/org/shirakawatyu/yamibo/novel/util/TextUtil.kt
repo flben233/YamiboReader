@@ -2,9 +2,14 @@ package org.shirakawatyu.yamibo.novel.util
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 class TextUtil {
     companion object {
+        private val executor: ExecutorService = Executors.newFixedThreadPool(8)
         fun pagingText(
             text: String,
             height: Dp,
@@ -19,12 +24,16 @@ class TextUtil {
             val maxLine = (ValueUtil.dpToPx(height) / ValueUtil.spToPx(lineHeight)).toInt()
             val result = ArrayList<String>()
             val resultLines = ArrayList<String>()
+            val futureTasks = ArrayList<Future<List<String>>>()
             for (line in textLines) {
                 if (line.trim().isEmpty()) {
                     continue
                 }
-//                resultLines.addAll(line.chunked(perLineNum))
-                resultLines.addAll(chunkLine(line, perLineNum))
+                futureTasks.add(executor.submit(Callable { chunkLine(line, perLineNum) }))
+//                resultLines.addAll(chunkLine(line, perLineNum))
+            }
+            futureTasks.forEach {
+                resultLines.addAll(it.get())
             }
             resultLines.chunked(maxLine).forEach {
                 result.add(it.joinToString("\n") + "\n")
@@ -56,14 +65,17 @@ class TextUtil {
                     newLine = ArrayList()
                     cnt = 0.0
                 }
-                if (newLine.size == 0 && c.toString().matches(Regex("\\p{Punct}"))) {
+                if (chunks.isNotEmpty() && newLine.size == 0 && c.toString().matches(Regex("\\p{Punct}"))) {
                     val s = chunks[chunks.size - 1]
-                    val wordSeq = s.substring(getLastWordIndex(s))
-                    newLine.addAll(wordSeq.toList())
-                    wordSeq.forEach {
-                        cnt += getWidth(it)
+                    val lastWordIndex = getLastWordIndex(s)
+                    if (lastWordIndex != -1) {
+                        val wordSeq = s.substring(lastWordIndex)
+                        newLine.addAll(wordSeq.toList())
+                        wordSeq.forEach {
+                            cnt += getWidth(it)
+                        }
+                        chunks[chunks.size - 1] = s.substring(0, s.length - wordSeq.length)
                     }
-                    chunks[chunks.size - 1] = s.substring(0, s.length - wordSeq.length)
                 }
                 cnt += getWidth(c)
                 newLine.add(c)
