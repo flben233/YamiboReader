@@ -6,13 +6,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,10 +35,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.shirakawatyu.yamibo.novel.constant.RequestConfig
+import org.shirakawatyu.yamibo.novel.ui.theme.YellowLightDark
 import org.shirakawatyu.yamibo.novel.ui.vm.ReaderVM
 import org.shirakawatyu.yamibo.novel.ui.widget.ContentViewer
 import org.shirakawatyu.yamibo.novel.ui.widget.NumInputWithConfirm
 import org.shirakawatyu.yamibo.novel.ui.widget.PassageWebView
+import org.shirakawatyu.yamibo.novel.util.ComposeUtil.Companion.SetStatusBarColor
 
 
 @Composable
@@ -49,7 +51,9 @@ fun ReaderPage(
     val uiState by readerVM.uiState.collectAsState()
     val pagerState = rememberPagerState(pageCount = { uiState.htmlList.size })
     var showSettingDialog by remember { mutableStateOf(false) }
-    val context = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
+
+    SetStatusBarColor(YellowLightDark)
 
     BoxWithConstraints {
         LaunchedEffect(Unit) {
@@ -73,8 +77,7 @@ fun ReaderPage(
                     onSetFontSize = { readerVM.onSetFontSize(it) },
                     onSetPadding = { readerVM.onSetPadding(it) },
                     onSetView = { readerVM.onSetView(it) },
-                    onSetLineHeight = { readerVM.onSetLineHeight(it) },
-                    onJumpPage = { readerVM.jumpPage() }
+                    onSetLineHeight = { readerVM.onSetLineHeight(it) }
                 )
             }
             HorizontalPager(
@@ -108,7 +111,7 @@ fun ReaderPage(
                 )
 
                 SideEffect {
-                    readerVM.onPageChange(pagerState, context)
+                    readerVM.onPageChange(pagerState, scope)
                 }
             }
         }
@@ -124,8 +127,7 @@ fun SettingDialog(
     onSetPage: (page: Int) -> Unit = {},
     onSetFontSize: (fontSize: TextUnit) -> Unit = {},
     onSetLineHeight: (lineHeight: TextUnit) -> Unit = {},
-    onSetPadding: (padding: Dp) -> Unit = {},
-    onJumpPage: () -> Unit = {}
+    onSetPadding: (padding: Dp) -> Unit = {}
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -160,15 +162,8 @@ fun SettingDialog(
                     range = IntRange(10, 100),
                     onConfirm = { onSetPadding(it.dp) }
                 )
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(0.dp, 10.dp, 0.dp, 0.dp), onClick = onJumpPage
-                ) {
-                    Text("跳转至上次阅读")
-                }
+                Spacer(modifier = Modifier.height(30.dp))
             }
-
         }
     }
 }

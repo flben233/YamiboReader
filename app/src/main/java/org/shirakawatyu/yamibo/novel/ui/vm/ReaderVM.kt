@@ -37,7 +37,7 @@ class ReaderVM : ViewModel() {
     private var pageEnd = true
     private var maxHeight = 0.dp
     private var maxWidth = 0.dp
-    private var initialPage = 0
+    private var initialized = false
     private val logTag = "ReaderVM"
     private var compositionScope: CoroutineScope? = null
     var url by mutableStateOf("")
@@ -53,28 +53,23 @@ class ReaderVM : ViewModel() {
         url = initUrl
         maxWidth = initWidth
         maxHeight = initHeight
+        val setState = {
+            FavoriteUtil.getFavoriteMap { it2 ->
+                it2[url]?.let { it1 ->
+                    Log.i(logTag, "first: $it1")
+                    _uiState.value = _uiState.value.copy(currentView = it1.lastView)
+                }
+                displayWebView = true
+            }
+        }
         SettingsUtil.getSettings(callback = {
             _uiState.value = _uiState.value.copy(
                 fontSize = ValueUtil.pxToSp(it.fontSizePx),
                 lingHeight = ValueUtil.pxToSp(it.lineHeightPx),
                 padding = it.padding
             )
-            FavoriteUtil.getFavoriteMap { it2 ->
-                it2[url]?.let { it1 ->
-                    Log.i(logTag, "first: $it1")
-                    _uiState.value = _uiState.value.copy(currentView = it1.lastView)
-                }
-                displayWebView = true
-            }
-        }, onNull = {
-            FavoriteUtil.getFavoriteMap { it2 ->
-                it2[url]?.let { it1 ->
-                    Log.i(logTag, "first: $it1")
-                    _uiState.value = _uiState.value.copy(currentView = it1.lastView)
-                }
-                displayWebView = true
-            }
-        })
+            setState()
+        }, onNull = setState)
     }
 
     fun loadFinished(html: String) {
@@ -82,27 +77,27 @@ class ReaderVM : ViewModel() {
         Thread {
             getContentByHTML(html)
             GlobalData.loading = false
-            displayWebView = false
-            FavoriteUtil.getFavoriteMap {
-                it[url]?.let { it1 ->
-                    if (uiState.value.currentView == it1.lastView) {
-                        initialPage = it1.lastPage
+            if (!initialized) {
+                FavoriteUtil.getFavoriteMap {
+                    it[url]?.let { it1 ->
                         CoroutineScope(Dispatchers.Main).launch {
                             while (pagerState == null) {
                                 delay(100)
                             }
                             compositionScope?.launch {
-                                pagerState?.animateScrollToPage(initialPage)
+                                pagerState?.animateScrollToPage(it1.lastPage)
+                                initialized = true
                             }
                         }
                     }
                 }
+            } else {
+                compositionScope?.launch {
+                    pagerState?.scrollToPage(0)
+                }
             }
+            displayWebView = false
         }.start()
-    }
-
-    fun jumpPage() {
-        onSetPage(initialPage)
     }
 
     private fun getContentByHTML(html: String) {
@@ -150,10 +145,12 @@ class ReaderVM : ViewModel() {
         } else {
             pageEnd = true
         }
-        if (curPagerState.currentPage == 0 || curPagerState.currentPage != curPagerState.targetPage) {
-            saveHistory(curPagerState.targetPage)
-        }
-        if (curPagerState.currentPage != curPagerState.targetPage && _uiState.value.scale != 1f) {
+        println(curPagerState.currentPage)
+        println(curPagerState.targetPage)
+//        if (curPagerState.currentPage == 0 || curPagerState.currentPage != curPagerState.targetPage) {
+        saveHistory(curPagerState.targetPage)
+//        }
+        if (_uiState.value.scale != 1f) {
             _uiState.value = _uiState.value.copy(scale = 1f, offset = Offset(0f, 0f))
         }
     }
@@ -196,9 +193,7 @@ class ReaderVM : ViewModel() {
 
     fun onSetPage(page: Int) {
         compositionScope?.launch {
-//            withContext(coroutineContext) {
-                pagerState?.animateScrollToPage(page)
-//            }
+            pagerState?.animateScrollToPage(page)
         }
     }
 

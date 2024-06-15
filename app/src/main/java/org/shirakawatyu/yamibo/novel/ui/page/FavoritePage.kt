@@ -15,8 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.shirakawatyu.yamibo.novel.item.FavoriteItem
+import org.shirakawatyu.yamibo.novel.ui.theme.YamiboColors
 import org.shirakawatyu.yamibo.novel.ui.vm.FavoriteVM
 import org.shirakawatyu.yamibo.novel.ui.widget.TopBar
+import org.shirakawatyu.yamibo.novel.util.ComposeUtil.Companion.SetStatusBarColor
 
 
 @Composable
@@ -25,6 +27,8 @@ fun FavoritePage(
     navController: NavController
 ) {
     val uiState by favoriteVM.uiState.collectAsState()
+
+    SetStatusBarColor(YamiboColors.onSurface)
 
     Column {
         TopBar(title = "收藏") {
