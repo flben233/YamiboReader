@@ -1,7 +1,6 @@
 package org.shirakawatyu.yamibo.novel.ui.vm
 
 import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -28,20 +28,18 @@ import org.shirakawatyu.yamibo.novel.util.HTMLUtil
 import org.shirakawatyu.yamibo.novel.util.SettingsUtil
 import org.shirakawatyu.yamibo.novel.util.TextUtil
 import org.shirakawatyu.yamibo.novel.util.ValueUtil
-import java.util.concurrent.Executors
 
 class ReaderVM : ViewModel() {
     private val _uiState = MutableStateFlow(ReaderState())
     val uiState = _uiState.asStateFlow()
 
-    @OptIn(ExperimentalFoundationApi::class)
-    var pagerState: PagerState? = null
+    private var pagerState: PagerState? = null
     private var pageEnd = true
     private var maxHeight = 0.dp
     private var maxWidth = 0.dp
     private var initialPage = 0
-    private val executor = Executors.newFixedThreadPool(32)
     private val logTag = "ReaderVM"
+    private var compositionScope: CoroutineScope? = null
     var url by mutableStateOf("")
         private set
     var displayWebView by mutableStateOf(false)
@@ -82,21 +80,25 @@ class ReaderVM : ViewModel() {
     fun loadFinished(html: String) {
         GlobalData.loading = true
         Thread {
-            val l = System.currentTimeMillis()
             getContentByHTML(html)
-            println(System.currentTimeMillis() - l)
             GlobalData.loading = false
             displayWebView = false
-            onSetPage(0)
-        }.start()
-        FavoriteUtil.getFavoriteMap {
-            it[url]?.let { it1 ->
-                if (uiState.value.currentView == it1.lastView) {
-                    initialPage = it1.lastPage
+            FavoriteUtil.getFavoriteMap {
+                it[url]?.let { it1 ->
+                    if (uiState.value.currentView == it1.lastView) {
+                        initialPage = it1.lastPage
+                        CoroutineScope(Dispatchers.Main).launch {
+                            while (pagerState == null) {
+                                delay(100)
+                            }
+                            compositionScope?.launch {
+                                pagerState?.animateScrollToPage(initialPage)
+                            }
+                        }
+                    }
                 }
             }
-        }
-//        onSetPage(0)
+        }.start()
     }
 
     fun jumpPage() {
@@ -128,11 +130,13 @@ class ReaderVM : ViewModel() {
         _uiState.value = ReaderState(passages, _uiState.value.currentView)
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
-    fun onPageChange(curPagerState: PagerState) {
+    fun onPageChange(curPagerState: PagerState, scope: CoroutineScope) {
         var viewIndex = uiState.value.currentView
         if (pagerState == null) {
             pagerState = curPagerState
+        }
+        if (compositionScope == null) {
+            compositionScope = scope
         }
         if (curPagerState.currentPage == curPagerState.targetPage &&
             curPagerState.currentPage == uiState.value.htmlList.size - 1 &&
@@ -167,7 +171,6 @@ class ReaderVM : ViewModel() {
         }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     fun saveSettings() {
         val state = _uiState.value
         pagerState?.let {
@@ -191,10 +194,11 @@ class ReaderVM : ViewModel() {
         displayWebView = true
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     fun onSetPage(page: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
-            pagerState?.scrollToPage(page)
+        compositionScope?.launch {
+//            withContext(coroutineContext) {
+                pagerState?.animateScrollToPage(page)
+//            }
         }
     }
 

@@ -1,6 +1,5 @@
 package org.shirakawatyu.yamibo.novel.ui.page
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,10 +17,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -40,7 +41,6 @@ import org.shirakawatyu.yamibo.novel.ui.widget.NumInputWithConfirm
 import org.shirakawatyu.yamibo.novel.ui.widget.PassageWebView
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ReaderPage(
     readerVM: ReaderVM = viewModel(),
@@ -49,6 +49,7 @@ fun ReaderPage(
     val uiState by readerVM.uiState.collectAsState()
     val pagerState = rememberPagerState(pageCount = { uiState.htmlList.size })
     var showSettingDialog by remember { mutableStateOf(false) }
+    val context = rememberCoroutineScope()
 
     BoxWithConstraints {
         LaunchedEffect(Unit) {
@@ -56,7 +57,7 @@ fun ReaderPage(
         }
     }
     if (readerVM.displayWebView) {
-        PassageWebView(url = "${RequestConfig.BASE_URL}/${url}&page=${uiState.currentView}") { html, fromUrl ->
+        PassageWebView(url = "${RequestConfig.BASE_URL}/${url}&page=${uiState.currentView}") { html, _ ->
             readerVM.loadFinished(html)
         }
     } else {
@@ -105,7 +106,10 @@ fun ReaderPage(
                     currentPage = pagerState.currentPage,
                     pageCount = pagerState.pageCount
                 )
-                readerVM.onPageChange(pagerState)
+
+                SideEffect {
+                    readerVM.onPageChange(pagerState, context)
+                }
             }
         }
     }

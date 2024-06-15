@@ -23,9 +23,7 @@ import org.shirakawatyu.yamibo.novel.bean.Content
 import org.shirakawatyu.yamibo.novel.bean.ContentType
 import org.shirakawatyu.yamibo.novel.constant.RequestConfig
 import org.shirakawatyu.yamibo.novel.global.GlobalData
-import kotlin.io.encoding.ExperimentalEncodingApi
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun ContentViewer(
     data: Content,
@@ -38,24 +36,9 @@ fun ContentViewer(
 ) {
     Column {
         if (data.type == ContentType.IMG) {
-//            println(data.data)
-//            val byteData = Base64.decode(data.data)
-//            Image(
-//                bitmap = BitmapFactory.decodeByteArray(
-//                    byteData,
-//                    0,
-//                    byteData.size
-//                ).asImageBitmap(),
-//                contentDescription = "",
-//                contentScale = ContentScale.Fit,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .weight(1f)
-//            )
             SubcomposeAsyncImage(
                 modifier = Modifier.weight(1f),
                 model = ImageRequest.Builder(LocalContext.current)
-//                    .data(Base64.decode(data.data))
                     .data(data.data)
                     .crossfade(true)
                     .addHeader("Cookie", GlobalData.cookie)

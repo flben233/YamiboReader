@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import org.shirakawatyu.yamibo.novel.constant.RequestConfig
 import org.shirakawatyu.yamibo.novel.global.GlobalData
 import org.shirakawatyu.yamibo.novel.util.CookieUtil
 
@@ -30,12 +31,16 @@ open class YamiboWebViewClient : WebViewClient() {
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
-        view?.evaluateJavascript(jsCommand, null)
-        val cookieManager = CookieManager.getInstance()
-        val cookie = cookieManager.getCookie(url)
-        CookieUtil.saveCookie(cookie)
+        url?.let {
+            if (it.contains(RequestConfig.BASE_URL)) {
+                view?.evaluateJavascript(jsCommand, null)
+                val cookieManager = CookieManager.getInstance()
+                val cookie = cookieManager.getCookie(url)
+                CookieUtil.saveCookie(cookie)
+                GlobalData.cookie = cookie
+            }
+        }
         GlobalData.loading = false
-        GlobalData.cookie = cookie
         super.onPageFinished(view, url)
     }
 }

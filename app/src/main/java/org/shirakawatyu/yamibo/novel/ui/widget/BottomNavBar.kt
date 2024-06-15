@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,7 +21,7 @@ fun BottomNavBar(
     navBarVM: BottomNavBarVM = viewModel()
 ) {
     val uiState by navBarVM.uiState.collectAsState()
-    NavigationBar(Modifier.height(50.dp)) {
+    NavigationBar(Modifier.height(50.dp), containerColor = YamiboColors.onSurface) {
         uiState.icons.forEachIndexed { index, item ->
             NavigationBarItem(
                 icon = { Icon(item, contentDescription = "") },

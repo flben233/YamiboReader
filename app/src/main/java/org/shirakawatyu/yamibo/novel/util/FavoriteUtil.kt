@@ -3,7 +3,6 @@ package org.shirakawatyu.yamibo.novel.util
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONObject
-import com.alibaba.fastjson2.TypeReference
 import org.shirakawatyu.yamibo.novel.bean.Favorite
 
 class FavoriteUtil {

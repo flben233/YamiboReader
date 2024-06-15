@@ -1,20 +1,16 @@
 package org.shirakawatyu.yamibo.novel.item
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -57,7 +53,7 @@ fun FavoriteItem(
                 )
                 Text(color = Color.Black, fontSize = 12.sp, text = "上次读到第${lastPage}页, 对应网页第${lastView}页")
             }
-            Icon(Icons.Filled.KeyboardArrowRight, "", tint = Color.Black)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "", tint = Color.Black)
         }
     }
 }
