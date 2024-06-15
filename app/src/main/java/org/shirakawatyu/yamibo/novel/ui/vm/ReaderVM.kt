@@ -150,7 +150,7 @@ class ReaderVM : ViewModel() {
 //        if (curPagerState.currentPage == 0 || curPagerState.currentPage != curPagerState.targetPage) {
         saveHistory(curPagerState.targetPage)
 //        }
-        if (_uiState.value.scale != 1f) {
+        if (curPagerState.settledPage != curPagerState.targetPage && _uiState.value.scale != 1f) {
             _uiState.value = _uiState.value.copy(scale = 1f, offset = Offset(0f, 0f))
         }
     }
