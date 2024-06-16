@@ -11,7 +11,7 @@ android {
         applicationId = "org.shirakawatyu.yamibo.novel"
         minSdk = 24
         targetSdk = 34
-        versionCode = 6
+        versionCode = 7
         versionName = "Sakura"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
